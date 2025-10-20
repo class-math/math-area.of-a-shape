@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>図形面積計算アプリ</title>
+    <style>
+        /* CSSは変更なし */
+        body {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            color: #333;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .calculator-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .shape-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #e9ecef;
+            color: #495057;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .tab-button.active {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: #dee2e6;
+            transform: translateY(-1px);
+        }
+
+        .calculator-form {
+            display: none;
+        }
+
+        .calculator-form.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.3);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #155724;
+            display: none;
+        }
+
+        .division-section {
+            background: #fff3cd;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .division-list {
+            margin-top: 20px;
+        }
+
+        .division-item {
+            background: white;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .division-info {
+            flex: 1;
+        }
+
+        .division-name {
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 5px;
+        }
+
+        .division-area {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+
+        .remove-btn {
+            background: #e17055;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #d63031;
+            transform: scale(1.05);
+        }
+
+        .total-area {
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+
+        .add-division-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .add-division-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(253,121,168,0.3);
+        }
+
+        .check-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108,92,231,0.3);
+        }
+
+        .shape-display {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .answer-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f3f4;
+            border-radius: 8px;
+            border-left: 4px solid #6c5ce7;
+        }
+
+        .result.correct {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .result.incorrect {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .formula {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #1565c0;
+        }
+
+        .drawing-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .drawing-tools label {
+            font-weight: 500;
+            color: #495057;
+            user-select: none; /* ラベル選択を防ぐ */
+        }
+        .drawing-tools input[type="radio"], .drawing-tools input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .drawing-tools button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 6px;
+            background: #e17055;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+        .drawing-tools button:hover {
+            background: #d63031;
+        }
+
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .shape-tabs {
+                justify-content: center;
+            }
+
+            .tab-button {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+
+            .drawing-tools {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📐 図形面積計算アプリ</h1>
+            <p>基本図形の面積計算と複雑な図形の分割計算ができます</p>
+        </header>
+
+        <main class="main-content">
+            <section class="calculator-section">
+                <h2 class="section-title">
+                    🔢 面積計算
+                </h2>
+
+                <div class="shape-tabs">
+                    <button class="tab-button active" data-shape="rectangle">長方形</button>
+                    <button class="tab-button" data-shape="square">正方形</button>
+                    <button class="tab-button" data-shape="triangle">三角形</button>
+                    <button class="tab-button" data-shape="parallelogram">平行四辺形</button>
+                    <button class="tab-button" data-shape="u-shape">コの字型</button>
+                    <button class="tab-button" data-shape="hollow-square">穴あき正方形</button>
+                    <button class="tab-button" data-shape="l-shape">L字型</button>
+                </div>
+
+                <form class="calculator-form active" id="rectangle-form">
+                    <div class="input-group">
+                        <label for="rect-width">横の長さ (cm)</label>
+                        <input type="number" id="rect-width" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="rect-height">縦の長さ (cm)</label>
+                        <input type="number" id="rect-height" step="0.1" min="0" required>
+                    </div>
+                    <button type="button" class="calculate-btn" onclick="drawRectangle()">図形を表示</button>
+
+                    <div class="answer-section" id="rectangle-answer" style="display: none;">
+                        <div class="input-group">
+                            <label for="rect-answer">あなたの答え (cm²)</label>
+                            <input type="number" id="rect-answer" step="0.1" min="0" required>
+                        </div>
+                        <button type="button" class="check-btn" onclick="checkRectangleAnswer()">答えを確認</button>
+                        <div class="result" id="rectangle-result"></div>
+                    </div>
+                </form>
+
+                <form class="calculator-form" id="square-form">
+                    <div class="input-group">
+                        <label for="square-side">一辺の長さ (cm)</label>
+                        <input type="number" id="square-side" step="0.1" min="0" required>
+                    </div>
+                    <button type="button" class="calculate-btn" onclick="drawSquare()">図形を表示</button>
+
+                    <div class="answer-section" id="square-answer" style="display: none;">
+                        <div class="input-group">
+                            <label for="square-answer-input">あなたの答え (cm²)</label>
+                            <input type="number" id="square-answer-input" step="0.1" min="0" required>
+                        </div>
+                        <button type="button" class="check-btn" onclick="checkSquareAnswer()">答えを確認</button>
+                        <div class="result" id="square-result"></div>
+                    </div>
+                </form>
+
+                <form class="calculator-form" id="triangle-form">
+                    <div class="input-group">
+                        <label for="triangle-base">底辺の長さ (cm)</label>
+                        <input type="number" id="triangle-base" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="triangle-height">高さ (cm)</label>
+                        <input type="number" id="triangle-height" step="0.1" min="0" required>
+                    </div>
+                    <button type="button" class="calculate-btn" onclick="drawTriangle()">図形を表示</button>
+
+                    <div class="answer-section" id="triangle-answer" style="display: none;">
+                        <div class="input-group">
+                            <label for="triangle-answer-input">あなたの答え (cm²)</label>
+                            <input type="number" id="triangle-answer-input" step="0.1" min="0" required>
+                        </div>
+                        <button type="button" class="check-btn" onclick="checkTriangleAnswer()">答えを確認</button>
+                        <div class="result" id="triangle-result"></div>
+                    </div>
+                </form>
+
+                <form class="calculator-form" id="parallelogram-form">
+                    <div class="input-group">
+                        <label for="para-base">底辺の長さ (cm)</label>
+                        <input type="number" id="para-base" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="para-height">高さ (cm)</label>
+                        <input type="number" id="para-height" step="0.1" min="0" required>
+                    </div>
+                    <button type="button" class="calculate-btn" onclick="drawParallelogram()">図形を表示</button>
+
+                    <div class="answer-section" id="parallelogram-answer" style="display: none;">
+                        <div class="input-group">
+                            <label for="parallelogram-answer-input">あなたの答え (cm²)</label>
+                            <input type="number" id="parallelogram-answer-input" step="0.1" min="0" required>
+                        </div>
+                        <button type="button" class="check-btn" onclick="checkParallelogramAnswer()">答えを確認</button>
+                        <div class="result" id="parallelogram-result"></div>
+                    </div>
+                </form>
+
+                <form class="calculator-form" id="u-shape-form">
+                    <div class="input-group">
+                        <label for="u-outer-width">外側の横幅 (cm)</label>
+                        <input type="number" id="u-outer-width" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="u-outer-height">外側の縦幅 (cm)</label>
+                        <input type="number" id="u-outer-height" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="u-indent-width">へこみの幅 (cm)</label>
+                        <input type="number" id="u-indent-width" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="u-indent-depth">へこみの深さ (cm)</label>
+                        <input type="number" id="u-indent-depth" step="0.1" min="0" required>
+                    </div>
+                    <button type="button" class="calculate-btn" onclick="drawUShape()">図形を表示</button>
+
+                    <div class="answer-section" id="u-shape-answer" style="display: none;">
+                        <div class="input-group">
+                            <label for="u-shape-answer-input">あなたの答え (cm²)</label>
+                            <input type="number" id="u-shape-answer-input" step="0.1" min="0" required>
+                        </div>
+                        <button type="button" class="check-btn" onclick="checkUShapeAnswer()">答えを確認</button>
+                        <div class="result" id="u-shape-result"></div>
+                    </div>
+                </form>
+
+                <form class="calculator-form" id="hollow-square-form">
+                    <div class="input-group">
+                        <label for="hollow-outer-size">外側の一辺 (cm)</label>
+                        <input type="number" id="hollow-outer-size" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="hollow-inner-size">内側の一辺 (cm)</label>
+                        <input type="number" id="hollow-inner-size" step="0.1" min="0" required>
+                    </div>
+                    <button type="button" class="calculate-btn" onclick="drawHollowSquare()">図形を表示</button>
+
+                    <div class="answer-section" id="hollow-square-answer" style="display: none;">
+                        <div class="input-group">
+                            <label for="hollow-square-answer-input">あなたの答え (cm²)</label>
+                            <input type="number" id="hollow-square-answer-input" step="0.1" min="0" required>
+                        </div>
+                        <button type="button" class="check-btn" onclick="checkHollowSquareAnswer()">答えを確認</button>
+                        <div class="result" id="hollow-square-result"></div>
+                    </div>
+                </form>
+
+                <form class="calculator-form" id="l-shape-form">
+                    <div class="input-group">
+                        <label for="l-width1">横部分の幅 (cm)</label>
+                        <input type="number" id="l-width1" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="l-height1">横部分の高さ (cm)</label>
+                        <input type="number" id="l-height1" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="l-width2">縦部分の幅 (cm)</label>
+                        <input type="number" id="l-width2" step="0.1" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="l-height2">縦部分の高さ (cm)</label>
+                        <input type="number" id="l-height2" step="0.1" min="0" required>
+                    </div>
+                    <button type="button" class="calculate-btn" onclick="drawLShape()">図形を表示</button>
+
+                    <div class="answer-section" id="l-shape-answer" style="display: none;">
+                        <div class="input-group">
+                            <label for="l-shape-answer-input">あなたの答え (cm²)</label>
+                            <input type="number" id="l-shape-answer-input" step="0.1" min="0" required>
+                        </div>
+                        <button type="button" class="check-btn" onclick="checkLShapeAnswer()">答えを確認</button>
+                        <div class="result" id="l-shape-result"></div>
+                    </div>
+                </form>
+            </section>
+
+            <section class="calculator-section">
+                <h2 class="section-title">
+                    📊 図形表示エリア
+                </h2>
+                <p style="margin-bottom: 20px; color: #495057;">選択した図形がここに大きく表示されます</p>
+
+                <div class="drawing-tools">
+                    <div>
+                        <input type="checkbox" id="grid-toggle" checked>
+                        <label for="grid-toggle">方眼</label>
+                    </div>
+                    <div>
+                        <label>モード:</label>
+                        <input type="radio" name="op-mode" id="mode-move" value="move" checked>
+                        <label for="mode-move">移動</label>
+                        <input type="radio" name="op-mode" id="mode-draw" value="draw">
+                        <label for="mode-draw">描画</label>
+                    </div>
+                    <button type="button" id="clear-lines-btn">線を全削除</button>
+                </div>
+                <div id="main-shape-display" style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 15px; min-height: 400px; display: flex; align-items: center; justify-content: center; touch-action: none;">
+                    <div style="color: #6c757d; font-size: 1.1rem;">
+                        📐 左側で図形を選択して「図形を表示」ボタンを押してください
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let divisions = [];
+        let currentResult = null;
+        let currentShapeName = '';
+
+        let currentGridScale = 20;
+        let isDrawingLine = false;
+        let startLinePoint = { x: 0, y: 0 };
+        let previewLine = null;
+        let svgElement = null;
+        let svgRect = null;
+        let currentMode = 'move'; // 操作モード (move | draw)
+        // ▼▼▼ 修正: ドラッグ開始時の図形グループの移動量 ▼▼▼
+        let dragInitialTransform = { x: 0, y: 0 };
+
+
+        // タブ切り替え
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                document.querySelectorAll('.calculator-form').forEach(form => form.classList.remove('active'));
+                const targetForm = document.getElementById(button.dataset.shape + '-form');
+                targetForm.classList.add('active');
+                clearResults();
+            });
+        });
+
+        // 方眼を描画する関数 (色変更)
+        function drawGrid(svg, width, height, scale) {
+            const gridSize = Math.max(scale, 15);
+
+            let gridPattern = '<g id="grid-layer">';
+
+            // 細いグリッド線 (濃く変更)
+            gridPattern += `<defs><pattern id="grid" width="${gridSize}" height="${gridSize}" patternUnits="userSpaceOnUse"><path d="M ${gridSize} 0 L 0 0 0 ${gridSize}" fill="none" stroke="#333" stroke-width="0.5"/></pattern></defs>`;
+            gridPattern += `<rect width="${width}" height="${height}" fill="url(#grid)"/>`;
+
+            // 5cm間隔で太い線を追加 (黒に変更)
+            const majorGridSize = gridSize * 5;
+            for (let x = 0; x <= width; x += majorGridSize) {
+                gridPattern += `<line x1="${x}" y1="0" x2="${x}" y2="${height}" stroke="#000" stroke-width="1"/>`;
+            }
+            for (let y = 0; y <= height; y += majorGridSize) {
+                gridPattern += `<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="#000" stroke-width="1"/>`;
+            }
+
+            gridPattern += '</g>';
+            return gridPattern;
+        }
+
+        // ▼▼▼ SVGイベントリスナー設定 (修正なし) ▼▼▼
+        function setupSVGEventListeners(scale) {
+            currentGridScale = scale;
+            svgElement = document.getElementById('main-shape-display').querySelector('svg');
+            if (!svgElement) return;
+
+            svgRect = svgElement.getBoundingClientRect();
+            dragInitialTransform = {x: 0, y: 0}; // 移動量リセット
+
+            // イベントリスナーはSVG全体に設定 (描画開始判定のため)
+            svgElement.addEventListener('mousedown', startInteraction);
+            svgElement.addEventListener('mousemove', moveInteraction);
+            svgElement.addEventListener('mouseup', endInteraction);
+            svgElement.addEventListener('mouseleave', endInteraction);
+            svgElement.addEventListener('touchstart', startInteraction, { passive: false });
+            svgElement.addEventListener('touchmove', moveInteraction, { passive: false });
+            svgElement.addEventListener('touchend', endInteraction);
+
+            toggleGrid();
+            updateCursors(); // カーソルを初期化
+        }
+
+        // ▼▼▼ 共通の開始処理 (mousedown/touchstart) (修正なし) ▼▼▼
+        function startInteraction(e) {
+            if (currentMode === 'move' && e.target.closest('#draggable-shape')) {
+                onDragStart(e);
+            } else if (currentMode === 'draw') {
+                startDrawLine(e);
+            }
+        }
+        // ▼▼▼ 共通の移動処理 (mousemove/touchmove) (修正なし) ▼▼▼
+        function moveInteraction(e) {
+             if (isDragging) {
+                 onDragMove(e);
+             } else if (isDrawingLine) {
+                 drawLineMove(e);
+             }
+        }
+        // ▼▼▼ 共通の終了処理 (mouseup/touchend/mouseleave) (修正なし) ▼▼▼
+        function endInteraction(e) {
+             if (isDragging) {
+                 onDragEnd(e);
+             } else if (isDrawingLine) {
+                 endDrawLine(e);
+             }
+        }
+
+
+        // 長方形を描画 (色変更)
+        function drawRectangle() {
+            const width = parseFloat(document.getElementById('rect-width').value);
+            const height = parseFloat(document.getElementById('rect-height').value);
+            if (!width || !height) return;
+
+            const maxWidth = 350;
+            const maxHeight = 250;
+            const scaleX = maxWidth / width;
+            const scaleY = maxHeight / height;
+            const scale = Math.max(Math.min(scaleX, scaleY), 20);
+            const displayWidth = width * scale;
+            const displayHeight = height * scale;
+            const rectX = Math.round((500 - displayWidth) / 2 / scale) * scale;
+            const rectY = Math.round((350 - displayHeight) / 2 / scale) * scale;
+
+            const mainDisplay = document.getElementById('main-shape-display');
+            mainDisplay.innerHTML = `
+                <svg width="500" height="350" style="border: 2px solid #ddd; border-radius: 8px; background: white; user-select: none;">
+                    ${drawGrid(null, 500, 350, scale)}
+                    <g id="draggable-shape">
+                        <rect x="${rectX}" y="${rectY}" width="${displayWidth}" height="${displayHeight}"
+                                fill="#FFEB3B" stroke="#FBC02D" stroke-width="3" opacity="0.8"></rect>
+                        <rect x="${rectX + displayWidth / 2 - 25}" y="${rectY - 35}" width="50" height="20" fill="white" stroke="#333" stroke-width="1" rx="3"></rect>
+                        <text x="${rectX + displayWidth / 2}" y="${rectY - 20}" text-anchor="middle" font-size="18" font-weight="700" fill="#333">${width}cm</text>
+                        <rect x="${rectX - 50}" y="${rectY + displayHeight / 2 - 10}" width="40" height="20" fill="white" stroke="#333" stroke-width="1" rx="3"></rect>
+                        <text x="${rectX - 30}" y="${rectY + displayHeight / 2 + 5}" text-anchor="middle" font-size="18" font-weight="700" fill="#333">${height}cm</text>
+                    </g>
+                </svg>
+            `;
+
+            setupSVGEventListeners(scale);
+            makeDraggable('draggable-shape', scale);
+            document.getElementById('rectangle-answer').style.display = 'block';
+            currentResult = width * height;
+            currentShapeName = `長方形 (${width}×${height})`;
+        }
+
+        // 正方形を描画 (色変更)
+        function drawSquare() {
+            const side = parseFloat(document.getElementById('square-side').value);
+            if (!side) return;
+
+            const maxSize = 280;
+            const scale = Math.max(maxSize / side, 20);
+            const displaySize = side * scale;
+            const squareX = Math.round((500 - displaySize) / 2 / scale) * scale;
+            const squareY = Math.round((350 - displaySize) / 2 / scale) * scale;
+
+            const mainDisplay = document.getElementById('main-shape-display');
+            mainDisplay.innerHTML = `
+                <svg width="500" height="350" style="border: 2px solid #ddd; border-radius: 8px; background: white; user-select: none;">
+                    ${drawGrid(null, 500, 350, scale)}
+                    <g id="draggable-shape">
+                        <rect x="${squareX}" y="${squareY}" width="${displaySize}" height="${displaySize}"
+                                fill="#FFEB3B" stroke="#FBC02D" stroke-width="3" opacity="0.8"></rect>
+                        <rect x="${squareX + displaySize / 2 - 25}" y="${squareY - 35}" width="50" height="20" fill="white" stroke="#333" stroke-width="1" rx="3"></rect>
+                        <text x="${squareX + displaySize / 2}" y="${squareY - 20}" text-anchor="middle" font-size="18" font-weight="700" fill="#333">${side}cm</text>
+                        <rect x="${squareX - 50}" y="${squareY + displaySize / 2 - 10}" width="40" height="20" fill="white" stroke="#333" stroke-width="1" rx="3"></rect>
+                        <text x="${squareX - 30}" y="${squareY + displaySize / 2 + 5}" text-anchor="middle" font-size="18" font-weight="700" fill="#333">${side}cm</text>
+                    </g>
+                </svg>
+            `;
+
+            setupSVGEventListeners(scale);
+            makeDraggable('draggable-shape', scale);
+            document.getElementById('square-answer').style.display = 'block';
+            currentResult = side * side;
+            currentShapeName = `正方形 (一辺${side})`;
+        }
+
+        // 三角形を描画 (色変更)
+        function drawTriangle() {
+            const base = parseFloat(document.getElementById('triangle-base').value);
+            const height = parseFloat(document.getElementById('triangle-height').value);
+            if (!base || !height) return;
+
+            const maxWidth = 350;
+            const maxHeight = 250;
+            const scaleX = maxWidth / base;
+            const scaleY = maxHeight / height;
+            const scale = Math.max(Math.min(scaleX, scaleY), 20);
+            const displayBase = base * scale;
+            const displayHeight = height * scale;
+            const centerX = Math.round(250 / scale) * scale;
+            const bottomY = Math.round(300 / scale) * scale;
+            const topY = bottomY - displayHeight;
+            const points = `${centerX - displayBase/2},${bottomY} ${centerX + displayBase/2},${bottomY} ${centerX},${topY}`;
+
+            const mainDisplay = document.getElementById('main-shape-display');
+            mainDisplay.innerHTML = `
+                <svg width="500" height="350" style="border: 2px solid #ddd; border-radius: 8px; background: white; user-select: none;">
+                    ${drawGrid(null, 500, 350, scale)}
+                    <g id="draggable-shape">
+                        <polygon points="${points}" fill="#FFEB3B" stroke="#FBC02D" stroke-width="3" opacity="0.8"></polygon>
+                        <line x1="${centerX}" y1="${topY}" x2="${centerX}" y2="${bottomY}" stroke="#333" stroke-width="2" stroke-dasharray="5,5"></line>
+                        <rect x="${centerX - 25}" y="${bottomY + 10}" width="50" height="20" fill="white" stroke="#333" stroke-width="1" rx="3"></rect>
+                        <text x="${centerX}" y="${bottomY + 25}" text-anchor="middle" font-size="18" font-weight="700" fill="#333">${base}cm</text>
+                        <rect x="${centerX - 60}" y="${topY + displayHeight / 2 - 10}" width="50" height="20" fill="white" stroke="#333" stroke-width="1" rx="3"></rect>
+                        <text x="${centerX - 35}" y="${topY + displayHeight / 2 + 5}" text-anchor="middle" font-size="18" font-weight="700" fill="#333">${height}cm</text>
+                    </g>
+                </svg>
+            `;
+
+            setupSVGEventListeners(scale);
+            makeDraggable('draggable-shape', scale);
+            document.getElementById('triangle-answer').style.display = 'block';
+            currentResult = (base * height) / 2;
+            currentShapeName = `三角形 (底辺${base}×高さ${height})`;
+        }
+
+        // 平行四辺形を描画 (修正)
+        function drawParallelogram() {
+            const base = parseFloat(document.getElementById('para-base').value);
+            const height = parseFloat(document.getElementById('para-height').value);
+            if (!base || !height) return;
+
+            const maxWidth = 400; // SVG内の描画可能幅
+            const maxHeight = 280; // SVG内の描画可能高さ
+
+            const totalWidth = base * 1.3;
+            const scaleX = maxWidth / totalWidth;
+            const scaleY = maxHeight / height;
+            const scale = Math.min(scaleX, scaleY);
+
+            const displayBase = base * scale;
+            const displayHeight = height * scale;
+            const offset = displayBase * 0.3; // 傾き
+
+            const totalDisplayWidth = displayBase + offset;
+            const leftX = Math.round((500 - totalDisplayWidth) / 2 / scale) * scale;
+            const topY = Math.round((350 - displayHeight) / 2 / scale) * scale;
+            const bottomY = topY + displayHeight;
+
+            const points = `${leftX},${bottomY} ${leftX + displayBase},${bottomY} ${leftX + displayBase + offset},${topY} ${leftX + offset},${topY}`;
+
+            const mainDisplay = document.getElementById('main-shape-display');
+            mainDisplay.innerHTML = `
+                <svg width="500" height="350" style="border: 2px solid #ddd; border-radius: 8px; background: white; user-select: none;">
+                    ${drawGrid(null, 500, 350, scale)}
+                    <g id="draggable-shape">
+                        <polygon points="${points}" fill="#FFEB3B" stroke="#FBC02D" stroke-width="3" opacity="0.8"></polygon>
+                        <line x1="${leftX + offset}" y1="${topY}" x2="${leftX + offset}" y2="${bottomY}" stroke="#333" stroke-width="2" stroke-dasharray="5,5"></line>
+                        <text x="${leftX + displayBase / 2}" y="${bottomY + 20}" text-anchor="middle" font-size="16" font-weight="600" fill="#333">${base}cm</text>
+                        <text x="${leftX + offset - 20}" y="${topY + displayHeight / 2 + 5}" text-anchor="middle" font-size="16" font-weight="600" fill="#333"
+                                transform="rotate(-90, ${leftX + offset - 20}, ${topY + displayHeight / 2 + 5})">${height}cm</text>
+                    </g>
+                </svg>
+            `;
+
+            setupSVGEventListeners(scale);
+            makeDraggable('draggable-shape', scale);
+            document.getElementById('parallelogram-answer').style.display = 'block';
+            currentResult = base * height;
+            currentShapeName = `平行四辺形 (底辺${base}×高さ${height})`;
+        }
+
+        // コの字型を描画 (色変更)
+        function drawUShape() {
+            const outerWidth = parseFloat(document.getElementById('u-outer-width').value);
+            const outerHeight = parseFloat(document.getElementById('u-outer-height').value);
+            const indentWidth = parseFloat(document.getElementById('u-indent-width').value);
+            const indentDepth = parseFloat(document.getElementById('u-indent-depth').value);
+            if (!outerWidth || !outerHeight || !indentWidth || !indentDepth) return;
+            if (indentWidth >= outerWidth || indentDepth >= outerHeight) {
+                alert("へこみの幅や深さは、外側の幅や高さより小さくしてください。");
+                return;
+            }
+
+            const maxWidth = 400;
+            const maxHeight = 280;
+            const scaleX = maxWidth / outerWidth;
+            const scaleY = maxHeight / outerHeight;
+            const scale = Math.min(scaleX, scaleY);
+            const displayOuterWidth = outerWidth * scale;
+            const displayOuterHeight = outerHeight * scale;
+            const innerHeight = outerHeight - indentDepth;
+            const displayInnerWidth = indentWidth * scale;
+            const displayInnerHeight = innerHeight * scale;
+            const gridStartX = Math.round((500 - displayOuterWidth) / 2 / scale) * scale;
+            const gridStartY = Math.round((350 - displayOuterHeight) / 2 / scale) * scale;
+            const startX = gridStartX;
+            const startY = gridStartY;
+            const wallThickness = (displayOuterWidth - displayInnerWidth) / 2;
+            const path = `M ${startX} ${startY} L ${startX + displayOuterWidth} ${startY} L ${startX + displayOuterWidth} ${startY + displayOuterHeight} L ${startX + displayOuterWidth - wallThickness} ${startY + displayOuterHeight} L ${startX + displayOuterWidth - wallThickness} ${startY + displayInnerHeight} L ${startX + wallThickness} ${startY + displayInnerHeight} L ${startX + wallThickness} ${startY + displayOuterHeight} L ${startX} ${startY + displayOuterHeight} Z`;
+
+            const mainDisplay = document.getElementById('main-shape-display');
+            mainDisplay.innerHTML = `
+                <svg width="500" height="350" style="border: 2px solid #ddd; border-radius: 8px; background: white; user-select: none;">
+                    ${drawGrid(null, 500, 350, scale)}
+                    <g id="draggable-shape">
+                        <path d="${path}" fill="#FFEB3B" stroke="#FBC02D" stroke-width="3" opacity="0.8"></path>
+                        <text x="${startX + displayOuterWidth / 2}" y="${startY - 10}" text-anchor="middle" font-size="16" font-weight="600" fill="#333">${outerWidth}cm</text>
+                        <text x="${startX - 25}" y="${startY + displayOuterHeight / 2}" text-anchor="middle" font-size="16" font-weight="600" fill="#333" transform="rotate(-90, ${startX - 25}, ${startY + displayOuterHeight / 2})">${outerHeight}cm</text>
+                        <line x1="${startX + wallThickness}" y1="${startY + displayInnerHeight - 5}" x2="${startX + displayOuterWidth - wallThickness}" y2="${startY + displayInnerHeight - 5}" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" marker-start="url(#arrowhead)"></line>
+                        <text x="${startX + displayOuterWidth / 2}" y="${startY + displayInnerHeight - 10}" text-anchor="middle" font-size="14" font-weight="600" fill="#333">へこみ幅: ${indentWidth}cm</text>
+                        <line x1="${startX + displayOuterWidth - wallThickness + 5}" y1="${startY + displayInnerHeight}" x2="${startX + displayOuterWidth - wallThickness + 5}" y2="${startY + displayOuterHeight}" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" marker-start="url(#arrowhead)"></line>
+                        <text x="${startX + displayOuterWidth - wallThickness + 25}" y="${startY + (displayInnerHeight + displayOuterHeight) / 2}" text-anchor="middle" font-size="14" font-weight="600" fill="#333" transform="rotate(-90, ${startX + displayOuterWidth - wallThickness + 25}, ${startY + (displayInnerHeight + displayOuterHeight) / 2})">へこみ深さ: ${indentDepth}cm</text>
+                    </g>
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                        </marker>
+                    </defs>
+                </svg>
+            `;
+
+            setupSVGEventListeners(scale);
+            makeDraggable('draggable-shape', scale);
+            document.getElementById('u-shape-answer').style.display = 'block';
+            currentResult = (outerWidth * outerHeight) - (indentWidth * innerHeight);
+            currentShapeName = `コの字型 (外${outerWidth}×${outerHeight}, へこみ幅${indentWidth}, へこみ深さ${indentDepth})`;
+        }
+
+        // 穴あき四角を描画 (色変更)
+        function drawHollowSquare() {
+            const outerSize = parseFloat(document.getElementById('hollow-outer-size').value);
+            const innerSize = parseFloat(document.getElementById('hollow-inner-size').value);
+            if (!outerSize || !innerSize) return;
+
+            const maxSize = 300;
+            const scale = maxSize / outerSize;
+            const displayOuterSize = outerSize * scale;
+            const displayInnerSize = innerSize * scale;
+            const gridOuterX = Math.round((500 - displayOuterSize) / 2 / scale) * scale;
+            const gridOuterY = Math.round((350 - displayOuterSize) / 2 / scale) * scale;
+            const outerX = gridOuterX;
+            const outerY = gridOuterY;
+            const innerX = outerX + (displayOuterSize - displayInnerSize) / 2;
+            const innerY = outerY + (displayOuterSize - displayInnerSize) / 2;
+
+            const mainDisplay = document.getElementById('main-shape-display');
+            mainDisplay.innerHTML = `
+                <svg width="500" height="350" style="border: 2px solid #ddd; border-radius: 8px; background: white; user-select: none;">
+                    ${drawGrid(null, 500, 350, scale)}
+                    <g id="draggable-shape">
+                        <rect x="${outerX}" y="${outerY}" width="${displayOuterSize}" height="${displayOuterSize}" fill="#FFEB3B" stroke="#FBC02D" stroke-width="3" opacity="0.8"></rect>
+                        <rect x="${innerX}" y="${innerY}" width="${displayInnerSize}" height="${displayInnerSize}" fill="white" stroke="#FBC02D" stroke-width="3"></rect>
+                        <text x="${outerX + displayOuterSize / 2}" y="${outerY - 10}" text-anchor="middle" font-size="16" font-weight="600" fill="#333">外側: ${outerSize}cm</text>
+                        <text x="${innerX + displayInnerSize / 2}" y="${innerY + displayInnerSize / 2 + 5}" text-anchor="middle" font-size="16" font-weight="600" fill="#666">内側: ${innerSize}cm</text>
+                    </g>
+                </svg>
+            `;
+
+            setupSVGEventListeners(scale);
+            makeDraggable('draggable-shape', scale);
+            document.getElementById('hollow-square-answer').style.display = 'block';
+            currentResult = (outerSize * outerSize) - (innerSize * innerSize);
+            currentShapeName = `穴あき正方形 (外${outerSize}×${outerSize}, 内${innerSize}×${innerSize})`;
+        }
+
+        // L字型を描画 (色変更)
+        function drawLShape() {
+            const width1 = parseFloat(document.getElementById('l-width1').value);
+            const height1 = parseFloat(document.getElementById('l-height1').value);
+            const width2 = parseFloat(document.getElementById('l-width2').value);
+            const height2 = parseFloat(document.getElementById('l-height2').value);
+            if (!width1 || !height1 || !width2 || !height2) return;
+
+            const maxWidth = 400;
+            const maxHeight = 280;
+            const totalWidth = Math.max(width1, width2);
+            const totalHeight = height1 + height2;
+            const scaleX = maxWidth / totalWidth;
+            const scaleY = maxHeight / totalHeight;
+            const scale = Math.min(scaleX, scaleY);
+            const displayWidth1 = width1 * scale;
+            const displayHeight1 = height1 * scale;
+            const displayWidth2 = width2 * scale;
+            const displayHeight2 = height2 * scale;
+            const gridStartX = Math.round((500 - Math.max(displayWidth1, displayWidth2)) / 2 / scale) * scale;
+            const gridStartY = Math.round((350 - (displayHeight1 + displayHeight2)) / 2 / scale) * scale;
+            const startX = gridStartX;
+            const startY = gridStartY;
+            const path = `M ${startX} ${startY} L ${startX + displayWidth1} ${startY} L ${startX + displayWidth1} ${startY + displayHeight1} L ${startX + displayWidth2} ${startY + displayHeight1} L ${startX + displayWidth2} ${startY + displayHeight1 + displayHeight2} L ${startX} ${startY + displayHeight1 + displayHeight2} Z`;
+
+            const mainDisplay = document.getElementById('main-shape-display');
+            mainDisplay.innerHTML = `
+                <svg width="500" height="350" style="border: 2px solid #ddd; border-radius: 8px; background: white; user-select: none;">
+                    ${drawGrid(null, 500, 350, scale)}
+                    <g id="draggable-shape">
+                        <path d="${path}" fill="#FFEB3B" stroke="#FBC02D" stroke-width="3" opacity="0.8"></path>
+                        <text x="${startX + displayWidth1 / 2}" y="${startY - 10}" text-anchor="middle" font-size="16" font-weight="600" fill="#333">${width1}cm</text>
+                        <text x="${startX - 20}" y="${startY + displayHeight1 / 2}" text-anchor="middle" font-size="16" font-weight="600" fill="#333" transform="rotate(-90, ${startX - 20}, ${startY + displayHeight1 / 2})">${height1}cm</text>
+                        <text x="${startX + displayWidth2 / 2}" y="${startY + displayHeight1 + displayHeight2 + 20}" text-anchor="middle" font-size="16" font-weight="600" fill="#333">${width2}cm</text>
+                        <text x="${startX + displayWidth2 + 20}" y="${startY + displayHeight1 + displayHeight2 / 2}" text-anchor="middle" font-size="16" font-weight="600" fill="#333" transform="rotate(-90, ${startX + displayWidth2 + 20}, ${startY + displayHeight1 + displayHeight2 / 2})">${height2}cm</text>
+                    </g>
+                </svg>
+            `;
+
+            setupSVGEventListeners(scale);
+            makeDraggable('draggable-shape', scale);
+            document.getElementById('l-shape-answer').style.display = 'block';
+            currentResult = (width1 * height1) + (width2 * height2);
+            currentShapeName = `L字型 (${width1}×${height1} + ${width2}×${height2})`;
+        }
+
+
+        // --- 答えチェック関数群 (変更なし) ---
+        function checkRectangleAnswer() {
+            const userAnswer = parseFloat(document.getElementById('rect-answer').value);
+            const width = parseFloat(document.getElementById('rect-width').value);
+            const height = parseFloat(document.getElementById('rect-height').value);
+            const correctAnswer = width * height;
+            const resultElement = document.getElementById('rectangle-result');
+            if (Math.abs(userAnswer - correctAnswer) < 0.01) {
+                resultElement.textContent = `🎉 正解です！面積 = ${width} × ${height} = ${correctAnswer} cm²`;
+                resultElement.className = 'result correct';
+            } else {
+                resultElement.textContent = `❌ 不正解です。正しい答えは ${correctAnswer} cm² です。計算式: ${width} × ${height} = ${correctAnswer}`;
+                resultElement.className = 'result incorrect';
+            }
+            resultElement.style.display = 'block';
+        }
+        function checkSquareAnswer() {
+            const userAnswer = parseFloat(document.getElementById('square-answer-input').value);
+            const side = parseFloat(document.getElementById('square-side').value);
+            const correctAnswer = side * side;
+            const resultElement = document.getElementById('square-result');
+            if (Math.abs(userAnswer - correctAnswer) < 0.01) {
+                resultElement.textContent = `🎉 正解です！面積 = ${side} × ${side} = ${correctAnswer} cm²`;
+                resultElement.className = 'result correct';
+            } else {
+                resultElement.textContent = `❌ 不正解です。正しい答えは ${correctAnswer} cm² です。計算式: ${side} × ${side} = ${correctAnswer}`;
+                resultElement.className = 'result incorrect';
+            }
+            resultElement.style.display = 'block';
+        }
+        function checkTriangleAnswer() {
+            const userAnswer = parseFloat(document.getElementById('triangle-answer-input').value);
+            const base = parseFloat(document.getElementById('triangle-base').value);
+            const height = parseFloat(document.getElementById('triangle-height').value);
+            const correctAnswer = (base * height) / 2;
+            const resultElement = document.getElementById('triangle-result');
+            if (Math.abs(userAnswer - correctAnswer) < 0.01) {
+                resultElement.textContent = `🎉 正解です！面積 = ${base} × ${height} ÷ 2 = ${correctAnswer} cm²`;
+                resultElement.className = 'result correct';
+            } else {
+                resultElement.textContent = `❌ 不正解です。正しい答えは ${correctAnswer} cm² です。計算式: ${base} × ${height} ÷ 2 = ${correctAnswer}`;
+                resultElement.className = 'result incorrect';
+            }
+            resultElement.style.display = 'block';
+        }
+        function checkParallelogramAnswer() {
+            const userAnswer = parseFloat(document.getElementById('parallelogram-answer-input').value);
+            const base = parseFloat(document.getElementById('para-base').value);
+            const height = parseFloat(document.getElementById('para-height').value);
+            const correctAnswer = base * height;
+            const resultElement = document.getElementById('parallelogram-result');
+            if (Math.abs(userAnswer - correctAnswer) < 0.01) {
+                resultElement.textContent = `🎉 正解です！面積 = ${base} × ${height} = ${correctAnswer} cm²`;
+                resultElement.className = 'result correct';
+            } else {
+                resultElement.textContent = `❌ 不正解です。正しい答えは ${correctAnswer} cm² です。計算式: ${base} × ${height} = ${correctAnswer}`;
+                resultElement.className = 'result incorrect';
+            }
+            resultElement.style.display = 'block';
+        }
+        function checkUShapeAnswer() {
+            const userAnswer = parseFloat(document.getElementById('u-shape-answer-input').value);
+            const outerWidth = parseFloat(document.getElementById('u-outer-width').value);
+            const outerHeight = parseFloat(document.getElementById('u-outer-height').value);
+            const indentWidth = parseFloat(document.getElementById('u-indent-width').value);
+            const indentDepth = parseFloat(document.getElementById('u-indent-depth').value);
+            const innerHeight = outerHeight - indentDepth;
+            const correctAnswer = (outerWidth * outerHeight) - (indentWidth * innerHeight);
+            const resultElement = document.getElementById('u-shape-result');
+            if (Math.abs(userAnswer - correctAnswer) < 0.01) {
+                resultElement.textContent = `🎉 正解です！面積 = (${outerWidth} × ${outerHeight}) - (${indentWidth} × (${outerHeight} - ${indentDepth})) = ${correctAnswer} cm²`;
+                resultElement.className = 'result correct';
+            } else {
+                resultElement.textContent = `❌ 不正解です。正しい答えは ${correctAnswer} cm² です。計算式: (${outerWidth} × ${outerHeight}) - (${indentWidth} × (${outerHeight} - ${indentDepth})) = ${correctAnswer}`;
+                resultElement.className = 'result incorrect';
+            }
+            resultElement.style.display = 'block';
+        }
+        function checkHollowSquareAnswer() {
+            const userAnswer = parseFloat(document.getElementById('hollow-square-answer-input').value);
+            const outerSize = parseFloat(document.getElementById('hollow-outer-size').value);
+            const innerSize = parseFloat(document.getElementById('hollow-inner-size').value);
+            const correctAnswer = (outerSize * outerSize) - (innerSize * innerSize);
+            const resultElement = document.getElementById('hollow-square-result');
+            if (Math.abs(userAnswer - correctAnswer) < 0.01) {
+                resultElement.textContent = `🎉 正解です！面積 = (${outerSize} × ${outerSize}) - (${innerSize} × ${innerSize}) = ${correctAnswer} cm²`;
+                resultElement.className = 'result correct';
+            } else {
+                resultElement.textContent = `❌ 不正解です。正しい答えは ${correctAnswer} cm² です。計算式: (${outerSize} × ${outerSize}) - (${innerSize} × ${innerSize}) = ${correctAnswer}`;
+                resultElement.className = 'result incorrect';
+            }
+            resultElement.style.display = 'block';
+        }
+        function checkLShapeAnswer() {
+            const userAnswer = parseFloat(document.getElementById('l-shape-answer-input').value);
+            const width1 = parseFloat(document.getElementById('l-width1').value);
+            const height1 = parseFloat(document.getElementById('l-height1').value);
+            const width2 = parseFloat(document.getElementById('l-width2').value);
+            const height2 = parseFloat(document.getElementById('l-height2').value);
+            const correctAnswer = (width1 * height1) + (width2 * height2);
+            const resultElement = document.getElementById('l-shape-result');
+            if (Math.abs(userAnswer - correctAnswer) < 0.01) {
+                resultElement.textContent = `🎉 正解です！面積 = (${width1} × ${height1}) + (${width2} × ${height2}) = ${correctAnswer} cm²`;
+                resultElement.className = 'result correct';
+            } else {
+                resultElement.textContent = `❌ 不正解です。正しい答えは ${correctAnswer} cm² です。計算式: (${width1} × ${height1}) + (${width2} × ${height2}) = ${correctAnswer}`;
+                resultElement.className = 'result incorrect';
+            }
+            resultElement.style.display = 'block';
+        }
+
+        // ▼▼▼ 結果クリア関数 (修正) ▼▼▼
+        function clearResults() {
+            document.querySelectorAll('.result').forEach(result => {
+                result.style.display = 'none';
+            });
+            document.querySelectorAll('.shape-display').forEach(display => {
+                display.style.display = 'none';
+            });
+            document.querySelectorAll('.answer-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            currentResult = null;
+            currentShapeName = '';
+
+            svgElement = null;
+            svgRect = null;
+            isDrawingLine = false;
+            previewLine = null;
+            dragInitialTransform = { x: 0, y: 0 }; // ★ 移動量もリセット
+        }
+
+        // ▼▼▼ ドラッグ機能 (変更なし) ▼▼▼
+        // グローバルスコープに移動し、他の関数からアクセス可能にする
+        let isDragging = false;
+        let dragStartX, dragStartY;
+
+        function makeDraggable(elementId, gridScale) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            updateCursors(); // 初期カーソル設定
+        }
+
+        // ▼▼▼ グローバル関数として定義 (修正) ▼▼▼
+        function getCurrentTransform(element) {
+            if (!element) return { x: 0, y: 0 };
+            const transform = element.getAttribute('transform') || '';
+            const match = transform.match(/translate\(([^,]+),([^)]+)\)/);
+            if (match) {
+                // transform 属性が存在すればその値を返す
+                return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
+            }
+            // transform 属性がなければ (0, 0) を返す
+            return { x: 0, y: 0 };
+        }
+
+        // ▼▼▼ グローバル関数として定義 (修正) ▼▼▼
+        function applyTransform(element, x, y, gridScale) {
+            if (!element) return;
+            const snappedX = Math.round(x / gridScale) * gridScale;
+            const snappedY = Math.round(y / gridScale) * gridScale;
+            element.setAttribute('transform', `translate(${snappedX}, ${snappedY})`);
+            // ★ グローバル変数への保存は削除 (dragInitialTransform は開始時のみ)
+        }
+
+        // ▼▼▼ グローバル関数として定義 (修正) ▼▼▼
+        function onDragStart(e) {
+            const element = document.getElementById('draggable-shape');
+            // 移動モードでない場合、または図形上以外で開始した場合はドラッグしない
+            if (currentMode !== 'move' || !e.target.closest('#draggable-shape') || !element) {
+                isDragging = false;
+                return;
+            }
+
+            isDrawingLine = false;
+            isDragging = true;
+            const touch = e.touches ? e.touches[0] : e;
+            dragStartX = touch.clientX;
+            dragStartY = touch.clientY;
+            dragInitialTransform = getCurrentTransform(element); // ★ 開始時の移動量を取得・保存
+            element.style.cursor = 'grabbing'; // ドラッグ中のみ掴むカーソル
+            e.preventDefault();
+        }
+
+        // ▼▼▼ グローバル関数として定義 (修正) ▼▼▼
+        function onDragMove(e) {
+            if (!isDragging) return;
+            const element = document.getElementById('draggable-shape');
+            if (!element) return;
+
+            e.preventDefault();
+            const touch = e.touches ? e.touches[0] : e;
+            const deltaX = touch.clientX - dragStartX;
+            const deltaY = touch.clientY - dragStartY;
+            // ★ 開始時の Transform 値を基準に計算
+            const newX = dragInitialTransform.x + deltaX;
+            const newY = dragInitialTransform.y + deltaY;
+            applyTransform(element, newX, newY, currentGridScale);
+        }
+
+        // ▼▼▼ グローバル関数として定義 (修正なし) ▼▼▼
+        function onDragEnd() {
+            if (isDragging) {
+                isDragging = false;
+                updateCursors(); // カーソルをモードに合わせて戻す
+            }
+        }
+
+
+        // --- 新機能の関数 ---
+
+        // 操作モード変更時のカーソル更新
+        function updateCursors() {
+            const shape = document.getElementById('draggable-shape');
+
+            if (currentMode === 'move') {
+                if (svgElement) svgElement.style.cursor = 'auto';
+                if (shape) shape.style.cursor = 'move';
+            } else { // 'draw'
+                if (svgElement) svgElement.style.cursor = 'crosshair';
+                if (shape) shape.style.cursor = 'crosshair';
+            }
+        }
+
+        // 方眼の表示/非表示を切り替え
+        function toggleGrid() {
+            const gridLayer = document.getElementById('grid-layer');
+            const gridToggle = document.getElementById('grid-toggle');
+            if (gridLayer && gridToggle) {
+                gridLayer.style.display = gridToggle.checked ? 'block' : 'none';
+            }
+        }
+
+        // ユーザーが描画した線をすべて削除 (修正)
+        function clearUserLines() {
+             const shapeGroup = document.getElementById('draggable-shape');
+             if (shapeGroup) {
+                 const lines = shapeGroup.querySelectorAll('line'); // ★ グループ内の line を選択
+                 lines.forEach(line => line.remove());
+             }
+        }
+
+        // ▼▼▼ マウス座標をSVG座標に変換し、グリッドにスナップする (修正) ▼▼▼
+        function getSVGPoint(e) {
+            if (!svgElement) return { x: 0, y: 0 };
+
+            if (!svgRect || e.type === 'mousedown' || e.type === 'touchstart') {
+                 svgRect = svgElement.getBoundingClientRect();
+            }
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            // SVGキャンバス上の座標
+            const svgX = clientX - svgRect.left;
+            const svgY = clientY - svgRect.top;
+
+            // ★ グループの現在の移動量を取得して考慮
+            const shapeGroup = document.getElementById('draggable-shape');
+            const currentTransform = getCurrentTransform(shapeGroup); // ★ 常に最新の transform を取得
+
+            const groupRelativeX = svgX - currentTransform.x;
+            const groupRelativeY = svgY - currentTransform.y;
+
+            // グリッドにスナップ
+            const snappedX = Math.round(groupRelativeX / currentGridScale) * currentGridScale;
+            const snappedY = Math.round(groupRelativeY / currentGridScale) * currentGridScale;
+
+            return { x: snappedX, y: snappedY };
+        }
+
+        // 線描画開始 (変更なし)
+        function startDrawLine(e) {
+            if (currentMode !== 'draw' || isDragging) {
+                isDrawingLine = false;
+                return;
+            }
+
+            e.preventDefault();
+            isDrawingLine = true;
+            startLinePoint = getSVGPoint(e);
+
+            const lineStyle = '5,5'; // 常に点線
+
+            previewLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            previewLine.setAttribute('x1', startLinePoint.x);
+            previewLine.setAttribute('y1', startLinePoint.y);
+            previewLine.setAttribute('x2', startLinePoint.x);
+            previewLine.setAttribute('y2', startLinePoint.y);
+            previewLine.setAttribute('stroke', '#000');
+            previewLine.setAttribute('stroke-width', '3');
+            previewLine.setAttribute('stroke-dasharray', lineStyle);
+            previewLine.style.pointerEvents = 'none';
+
+            const shapeGroup = document.getElementById('draggable-shape');
+            if (shapeGroup) {
+                shapeGroup.appendChild(previewLine);
+            }
+        }
+
+        // 線描画中 (変更なし)
+        function drawLineMove(e) {
+            if (!isDrawingLine || !previewLine) return;
+
+            e.preventDefault();
+            const currentPoint = getSVGPoint(e);
+            previewLine.setAttribute('x2', currentPoint.x);
+            previewLine.setAttribute('y2', currentPoint.y);
+        }
+
+        // 線描画終了 (変更なし)
+        function endDrawLine(e) {
+            if (!isDrawingLine) return;
+            isDrawingLine = false;
+
+            if (previewLine) {
+                 const x1 = previewLine.getAttribute('x1');
+                 const y1 = previewLine.getAttribute('y1');
+                 const x2 = previewLine.getAttribute('x2');
+                 const y2 = previewLine.getAttribute('y2');
+
+                 if (x1 === x2 && y1 === y2) {
+                     previewLine.remove();
+                 } else {
+                     previewLine.setAttribute('stroke', '#000');
+                     previewLine.setAttribute('stroke-width', '3');
+                 }
+            }
+            previewLine = null;
+        }
+
+        // 初期化処理 (変更なし)
+        document.getElementById('grid-toggle').addEventListener('change', toggleGrid);
+        document.getElementById('clear-lines-btn').addEventListener('click', clearUserLines);
+
+        // 操作モード切り替えリスナー
+        document.querySelectorAll('input[name="op-mode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                currentMode = e.target.value;
+                isDrawingLine = false;
+                if (previewLine) previewLine.remove();
+                previewLine = null;
+                isDragging = false;
+
+                updateCursors(); // モード変更時にカーソルを更新
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            if (svgElement) {
+                svgRect = svgElement.getBoundingClientRect();
+            }
+        });
+
+    </script>
+</body>
+</html>
